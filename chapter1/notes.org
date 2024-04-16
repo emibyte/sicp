@@ -1,0 +1,92 @@
+#+title: Notes
+
+* 1.1.3
+** General Evaluation Rule
+1. Evaluate the sub-expressions of the combination
+2. Apply the procedure that is the value of the leftmost sub-expression (the operator) to the arguments that are the values of the other sub-expressions (the operands)
+
+** Special forms
+- there are so called "special forms", like (define x 3), which are not combinations and have their own special evaluation rule (in this case binding the value 3 to x and adding x to the environment)
+
+The various kinds of expressions, and their evaluation rules, build up the syntax of a programming language.
+
+* 1.1.4
+** Procedure definition
+#+BEGIN_QUOTE
+(define (<name> <formal parameters>))
+  <body>)
+#+END_QUOTE
+
+* 1.1.5
+** Application process for compound procedures
+To apply a compound procedure to arguments, evaluate the body of the procedure with each formal parameter replaced by the corresponding argument.
+
+In practice the substitution is realized via an environment the procedure exists in. Actual substitution of the variables in the body of a procedure can lead to problems that i will find out about later.
+
+** Applicative-order versus normal order
+According to 1.1.3 the operands and operators are evaluated first and then the procedure is applied to the resulting arguments.
+
+*** Normal Order
+"fully expand an then reduce"
+
+*** Applicative Order
+"evaluate the arguments and then apply" method that the interpreter uses
+
+*** Value equivalency
+For procedure applications that can be modeled via substitution and that return "legitimate values", normal-order and applicative-order produce the same values.
+
+One Advantage of applicative-order evaluation is the possible avoidance of computing the same expression multiple times (e.g. (+ 5 1) in square)
+
+* 1.1.6
+#+BEGIN_QUOTE
+(cond (<p1> <e1>)
+      (<p2> <e2>)
+      ...
+      (<pn> <en>))
+#+END_QUOTE
+
+Evaluation strategy: first p1 is evaluated if it is true e1 is the value of the cond expression. If p1 is false, the next predicate is evaluated until one that is true is found, at which point the corresponding expression is returned.
+If none of the predicates evaluate to true, then the value of the expression is undefined.
+
+A predicate is a procedure (compound or primitive) that returns either true or false (#t/#f).
+
+else is a special form: if all previous predicates evaluate to false the expression corresponding to else is used. (technically this could also be replaced by predicate that always evaluates to true)
+
+#+BEGIN_QUOTE
+(if <predicate> <consequent> <alternative>)
+#+END_QUOTE
+
+small difference between if and cond: the <e> in the cond expression can be a sequence of expressions where the last expression is the one returned as the value of the cond expression. In the if expression the consequent and alternative must be single expressions.
+
+
+And and or are special forms since they do not necessarily have to evaluate all of the expressions passed to them!
+#+BEGIN_QUOTE
+(and <e1> <e2> ... <en>)
+#+END_QUOTE
+
+#+BEGIN_QUOTE
+(or <e1> <e2> ... <en>)
+#+END_QUOTE
+
+Not in contrast is an ordinary procedure.
+#+BEGIN_QUOTE
+(not <e>)
+#+END_QUOTE
+
+* 1.1.7
+** Exercise 1.7
+The problem with the calculation of square-roots for small numbers starts appearing for radicants that are smaller than the delta (closeness) we have defined in our good-enough? procedure.
+Example:
+#+BEGIN_SRC
+(square (sqrt 0.0001)) ;; 0.0010438..
+#+END_SRC
+
+A problem with the calculation of square-roots for very large numbers is that the improved guess might not vary at all from the previous guess thus leading to the program not terminating.
+Another reason could be, because for numbers that large the inaccuracy introduced by the limited precision of floating point numbers can lead to (/ x guess) being pretty much identical with guess.
+
+Solution:
+#+BEGIN_SRC
+(define (good-enough-fraction? guess x)
+  (< (abs (- (improve guess x) guess)) 0.00001))
+#+END_SRC
+This works much better for very big/small numbers (doesn't infinitely loop for big numbers and gives the correct answer for very small ones).
