@@ -90,3 +90,45 @@ Solution:
   (< (abs (- (improve guess x) guess)) 0.00001))
 #+END_SRC
 This works much better for very big/small numbers (doesn't infinitely loop for big numbers and gives the correct answer for very small ones).
+
+* 1.1.8 Procedures as Black-Box Abstractions
+** Bound variables
+The formal parameters of a function, which are also local to the bodies of that function. The function is independent of the name of its formal parameters.
+
+** Free variables
+Symbols used inside a scope that have a clear value and aren't bound variables. A function isn't independent of the names of its free variables.
+
+** Scope
+The set of expressions for which a given binding defines a name.
+The scope of the formal parameters of a function is the body of the function.
+
+** Internal definitions
+inside the sqrt.rkt program there's many functions that the user can call when in reality the only meaningful one we want to provide is the sqrt function.
+We can use internal definitions to hide those functions inside the sqrt functions via internal definitions.
+
+This approach, the nesting of definitions, is also called block structure.
+
+** Lexical scoping
+Refers to the idea that free variables in a procedure refer to bindings from enclosing procedure definitions. This is the environment the procedure was the defined in.
+
+* 1.2.1 Linear Recursion and Iteration
+The shape of factorial-top-down and factorial-bottom-up is quite different (factorial.rkt).
+
+** Linear Recursion
+factorial-top-down first expands and builds up a big product (deferred operations) that needs to be calculated when its fully expanded we evaluate the product.
+The length of the chain of deferred multiplications grows linearly with n and needs to be kept track of.
+** Linear Iteration
+factorial-bottom-up is not characterized by expansion and contraction. This is an iterative process where all we need to do is keep track of a set amount of variables that describe the state of the computation. We also need a rule for how those variables have to change as we transition from one state to the next.
+The number of steps required grows linearly with n.
+
+Linear iteration could theoretically be stopped and be picked up from the exact point it stopped by supplying it with the appropriate values of its state variables (the values they had when we stopped the calculation).
+With Linear recursion there's a bunch of background information about the state of the deferred operations that we can't directly read out of the programs variables.
+
+** Recursive Procedure vs Process
+Any procedure that directly or indirectly calls itself is a recursive procedure, but that doesn't make any statement about whether that procedure constructs an iterative or recursive process.
+
+** Tail Recursion
+Most implementations of common languages (e.g. C) are designed in a way where the interpretation of a recursive procedure consumes an amount of memory that is linear with the number of procedure calls (even when the described process is __iterative__).
+Which is why these languages resort to describing iterative processes via keywords like "do", "while" and so on.
+
+The property of a language to be able to execute an iterative process in constant space, even if implemented via a recursive procedure, is called __tail recursion__.

@@ -1,6 +1,8 @@
 #lang sicp
 
 (define (square x) (* x x))
+(define (square-exp x) (exp (double (log x))))
+(define (double x) (+ x x))
 
 (define (sqrt-iter guess x)
   (if (good-enough? guess x)
